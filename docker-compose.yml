@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  localstack:
+    image: localstack/localstack
+    container_name: localstack-example
+    hostname: localstack
+    ports:
+      - "4566:4566" #to see the status of all AWS services hosted by LocalStack https://localhost:4566/health
+    environment:
+      # Declare which aws services will be used in localstack
+      - SERVICES=sqs,iam,lambda
+      - DEBUG=1
+      # These variables are needed for localstack
+      - AWS_DEFAULT_REGION=eu-west-1
+      - AWS_ACCESS_KEY_ID=testUser
+      - AWS_SECRET_ACCESS_KEY=testAccessKey
+      - LAMBDA_REMOTE_DOCKER=false
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DATA_DIR=/tmp/localstack/data
+      - LOCAL_CODE_PATH=${PWD}
+    volumes:
+      - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./create-resources.sh:/docker-entrypoint-initaws.d/create-resources.sh
